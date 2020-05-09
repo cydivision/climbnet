@@ -2,94 +2,104 @@
 
 <img src="https://user-images.githubusercontent.com/3492780/81486875-9df4e280-921d-11ea-8a5b-56d67c93f49f.png" alt="result" width="75%" height="75%"/>
 
-# Overview
+## Overview
 
 Climbnet is a CCN that detects holds on climbing gym walls and returns the appropriate boundary mask for use in instance segmentation.
 
-## Images
-
-There model has been trained with 210 images.  
-`Holds` in the image have been tagged with two different categories.
-
 ## Categories
 
-`HOLD` - Includes holds as well as the large shaped volumes that a lot of gyms use.
+`HOLD` - Includes holds as well as the large shaped volumes.
 
-<img src="https://user-images.githubusercontent.com/3492780/81486871-9d5c4c00-921d-11ea-9dce-a7c1eae0d317.jpg" alt="holds" width="25%"/> 
-<img src="https://user-images.githubusercontent.com/3492780/81486872-9df4e280-921d-11ea-83c0-d824e8ac1d1d.png" alt="shaped volumes" width="25%%"/>
+<img src="https://user-images.githubusercontent.com/3492780/81486871-9d5c4c00-921d-11ea-9dce-a7c1eae0d317.jpg" alt="holds" width="25%"/> <img src="https://user-images.githubusercontent.com/3492780/81486872-9df4e280-921d-11ea-83c0-d824e8ac1d1d.png" alt="shaped volumes" width="25%"/>
 
-`VOLUME` - This refers to any and all box volumes. They are usually made of wood, triangular in shape, and usually have bolt holes so that holds can be mounted on them. Note that sometimes these are used as holds and sometimes not, depends on the gym. They are somtimes considered an extension of the wall and sometimes specific to a single climb. Again, it depends on the gym, setter, etc.
+`VOLUME` - This refers to any and all box volumes.
+
+> They are usually made of wood, triangular in shape, and often have bolt holes so that holds can be mounted on them. Sometimes they are themselves a hold or specific to a particular route as opposed to being just another part of the wall.
 
 <!-- <img src="./images/volumes_1.png" alt="result" width="25%"/>  -->
-<img src="https://user-images.githubusercontent.com/3492780/81486872-9df4e280-921d-11ea-83c0-d824e8ac1d1d.png" alt="volumes" width="25%%"/>
+<img src="https://user-images.githubusercontent.com/3492780/81486880-9f260f80-921d-11ea-97f8-68c8cb90541f.png" alt="volumes" width="25%%"/>
 
 | Category | Total |
 | -------- | :---: |
 | Hold     | 7307  |
 | Volume   |  520  |
 
-# Model
+## Model
 
-Available for download
+This project uses Facebook's [detectron2](https://github.com/facebookresearch/detectron2) implmentation of [Mask R-CNN](https://github.com/facebookresearch/detectron2/blob/master/configs/COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml) and was trained using `210` images.
 
-📁 [google drive](https://drive.google.com/open?id=1kbh4VqNh8JJF5hvb_mgERmptTi29_AJe)
+The weights are available for download using the following link.
 
-# Technical
+📁 [google drive](https://drive.google.com/drive/folders/1MMd7vu9b6XbNrVTxLZ_uehNue5ZBPgnL?usp=sharing)
 
-This project uses Facebook's [detectron2](https://github.com/facebookresearch/detectron2) implmentation of [Mask R-CNN](https://github.com/facebookresearch/detectron2/blob/master/configs/COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml).
+## Installation
 
-# Installing
+There are two ways to run the model.  
 
-Follow the detectron2 [getting started guide](https://github.com/facebookresearch/detectron2/blob/master/GETTING_STARTED.md) and replace their `COCO` weights with those downloaded from the google drive
+### Method 1  
+   
+Use the `demo.py` file provided with this project.    
+
+Install the required dependencies
+```
+# python 3.6+ 
+pip install -r requirements.txt
+```
+
+Run the demo
+```
+cd test
+python demo.py demo_image1.jpg <path_to_model_weights>
+```
+
+#### Method 2
+
+Follow the steps outlined in the detectron2 [getting started guide](https://github.com/facebookresearch/detectron2/blob/master/GETTING_STARTED.md). Replace the model weights with those from this project.  
+> Classes returned during inference will be incorrect. Instead of `Holds` and `Volumes` you will instead see classes from the `COCO` dataset.
 
 ```
 python demo.py --config-file ../configs/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml \
   --input input1.jpg input2.jpg \
   [--other-options]
-  --opts MODEL.WEIGHTS detectron2://COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/137849600/model_final_f10217.pkl
+  --opts MODEL.WEIGHTS <climbnet weights>
 ```
 
-# Issues
+## Issues
 
-## 📷 Imagery
+#### 📷 Imagery
 
-Most of the imagery used was sourced from the internet. As a result of that, most images already had compression or filters applied to them and are rather small in size, usually `1280x1280` or smaller.
+Most of the imagery used was sourced from the internet. As a result of that, many of the images have already had compression or filters applied to them and are rather small in size, usually `1280x1280` or smaller.
 
-Most of the imagery was taken from the same vantage point, which is usually directly facing the wall. This may lead to issues when running inference on imagery with different vantage points(sport climbs) or extremely sloped walls.
+A lot of the imagery was taken from the same vantage point (directly facing the wall), which may lead to issues when running inference on imagery with different vantage points(sport climbs) or extremely sloped walls.
 
-## 🎨 Categories - Should there be more, etc.
+#### 🦥 Model Size, Inference Time
 
-I'm not sure if two categories is the correct amount. It might be worth it to create different categories of holds and/or volumes as the number of training images increases.
+One of the downsides of using `detectron2` is that the size of the available networks+weights are very large. The inference time is also not very fast, especially when using a `cpu`. 
 
-## 🤿 Segmented Polygons
+#### 🤿 Segmented Polygons
 
-There are some segmented polygons in the data. They exist because the program that I used for tagging [Hyperlabel](https://hyperlable.com) does not support grouping as per the `COCO` specification. Both `Holds` and `Volumes` are affected.
+There are some segmented polygons in the data which affect the inference accuracy. They exist because the program that I used for tagging [Hyperlabel](https://hyperlabel.com) does not support grouping as per the `COCO` specification. Both `Holds` and `Volumes` are affected.
 
-> Ex. both pieces of the polygon below should be sent through the network as a part of a single segment but are currently passed as two distincly seperate holds
+> Ex. Both pieces of the polygon below should be sent through the network as a part of a single hold but are currently passed as two distinctly separate holds
 
 <img src="https://user-images.githubusercontent.com/3492780/81486876-9e8d7900-921d-11ea-83b9-bfb751ba775b.png" alt="result" width="50%" height="50%"/>
 
-# Swiss Chesse Problem
 
-This is a problem that I encountered while tagging the data that I later found an easier solution to.
+## Contributing
 
-If you think of piece of swiss cheese sans holes (image A) how do you easily tag/generate the boundaries of the cheese without including the holes (image B).
+Contributions and suggestions are welcome and encouraged, especially additional high quality image for training. 
 
-A. <img src="https://user-images.githubusercontent.com/3492780/81486879-9f260f80-921d-11ea-93d7-7505f6cf3166.png" width="25%">
-B. <img src="https://user-images.githubusercontent.com/3492780/81486878-9f260f80-921d-11ea-82c2-9b4ac77484f3.png" width="25%">
+## Questions
 
-This problem occurs mainly with `volumes` that have `holds` mounted onto them. When creating the polygonal boundaries the volume needs to be seperate from any attached holds.
+Open an issue or send me send me an [e-mail](mailto:sebastian@cydivision.com)
 
-The complicated and time consuming way to achieve this is to trace around the image in a pattern similar to how a piece of stained glass. Depending on the size of the volume and the holds that are mounted, you may need to use seperate polygons to tag the polygon correctly (image C).
+## TODO
 
-The easier and less time consumeing way to go about this is to tag each of the holds mounted on the volume and then tag the volume as a single polygon. Prior to training you run a pre-processing step that generates the correct mask (image E) using simple bit-manipulation. This process negates having to group any disparite volume segments.
-
-C. <img src="https://user-images.githubusercontent.com/3492780/81486877-9e8d7900-921d-11ea-9d6a-9120261856af.png" width="20%"> D. <img src="./images/pre_mask.png"> E. <img src="./images/mask.png">
-
-# Contributing
-
-Contributions/Suggestions are welcome and encouraged.
-
-## 📷 The Project needs more high quality images.
-
-Submit a pull request with your images added to the `contribution_images` folder or e-mail me: [sebastian@cydivision.com](mailto:sebastian@cydivision.com)
+- [ ] Add open source imagery
+- [ ] Collect and tag more images
+- [ ] Upload pre-processing script
+- [ ] Upload mask export script
+- [ ] Create video explaining tagging process for contributors
+- [ ] Explore reducing model size using Centermask, Mobilenet, etc.
+- [ ] Correct segmented polygons in the data
+- [ ] Include training stats. BOX AP, MASK AP etc.

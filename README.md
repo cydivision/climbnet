@@ -1,14 +1,10 @@
-# CLIMBNET - 🧗🏻‍♂️CNN for detecting indoor climbing holds
+# CLIMBNET - 🧗🏻‍♂️CNN for detecting + segmenting indoor climbing holds
 
 <img src="./images/result_so_ill.png" alt="result" width="75%" height="75%"/>
 
 # Overview
 
-Climbnet is a CCN that detects holds on climbing gym walls and returns the appropriate mask for use in instance segmentation.
-
-# Technical
-
-This project uses Facebook's [detectron2](https://github.com/facebookresearch/detectron2) implmentation of [Mask R-CNN](https://github.com/facebookresearch/detectron2/blob/master/configs/COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml).
+Climbnet is a CCN that detects holds on climbing gym walls and returns the appropriate boundary mask for use in instance segmentation.
 
 ## Images
 
@@ -32,13 +28,26 @@ There model has been trained with 210 images.
 | Hold     | 7307  |
 | Volume   |  520  |
 
-# Contributing
+# Model
 
-Contributions/Suggestions are welcome and encouraged.
+Available for download
 
-## 📷 The Project needs more high quality images.
+📁 [google drive](https://drive.google.com/open?id=1kbh4VqNh8JJF5hvb_mgERmptTi29_AJe)
 
-Submit a pull request with your images added to the `contribution_images` folder or e-mail me: [sebastian@cydivision.com](mailto:sebastian@cydivision.com)
+# Technical
+
+This project uses Facebook's [detectron2](https://github.com/facebookresearch/detectron2) implmentation of [Mask R-CNN](https://github.com/facebookresearch/detectron2/blob/master/configs/COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml).
+
+# Installing
+
+Follow the detectron2 [getting started guide](https://github.com/facebookresearch/detectron2/blob/master/GETTING_STARTED.md) and replace their `COCO` weights with those downloaded from the google drive
+
+```
+python demo.py --config-file ../configs/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml \
+  --input input1.jpg input2.jpg \
+  [--other-options]
+  --opts MODEL.WEIGHTS detectron2://COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/137849600/model_final_f10217.pkl
+```
 
 # Issues
 
@@ -60,10 +69,6 @@ There are some segmented polygons in the data. They exist because the program th
 
 <img src="./images/segmented.png" alt="result" width="50%" height="50%"/>
 
-# Development
-
-# Model
-
 # Swiss Chesse Problem
 
 This is a problem that I encountered while tagging the data that I later found an easier solution to.
@@ -80,3 +85,11 @@ The complicated and time consuming way to achieve this is to trace around the im
 The easier and less time consumeing way to go about this is to tag each of the holds mounted on the volume and then tag the volume as a single polygon. Prior to training you run a pre-processing step that generates the correct mask (image E) using simple bit-manipulation. This process negates having to group any disparite volume segments.
 
 C. <img src="./images/stained_glass.png" width="20%"> D. <img src="./images/pre_mask.png"> E. <img src="./images/mask.png">
+
+# Contributing
+
+Contributions/Suggestions are welcome and encouraged.
+
+## 📷 The Project needs more high quality images.
+
+Submit a pull request with your images added to the `contribution_images` folder or e-mail me: [sebastian@cydivision.com](mailto:sebastian@cydivision.com)
